@@ -90,19 +90,32 @@ function findOne(email){
 // update - deposit/withdraw amount
 function update(email, amount){
     return new Promise((resolve, reject) => { 
-        const customers = db
+        console.log("update()::email", email);
+        console.log("update()::amount", amount);
+
+        const user = db
             .collection('users')
             .findOneAndUpdate(
                 { email: email },
                 { $inc: { balance: amount }},
-                { returnDocument: "after" },
+                { new: true, upsert: true },
+                // { returnDocument: "before" },
                 // { upsert: true },
                 function (err, documents) {
                     err ? reject(err) : resolve(documents);
                 }
             )
-            .then((doc) => resolve(doc))
-            .catch((err) => reject(err)); 
+            .then((doc) => {
+                console.log("doc=", doc);
+                return resolve(doc);
+            })
+            .catch((err) => {
+                console.log("in legit callback; err=", err);
+                return reject(err);
+            }); 
+
+            
+        console.log("update()::user", user);
     });    
 }
 
